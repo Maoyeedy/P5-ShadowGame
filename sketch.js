@@ -41,6 +41,13 @@ let playerPos
 let lastMouseX
 let rotationY = 0
 
+let bgmIsPlayed = false
+let bgm
+function preload () {
+    soundFormats('mp3')
+    bgm = loadSound('./bgm.mp3')
+}
+
 function setup () {
     createCanvas(windowWidth, windowHeight, WEBGL)
     colorMode(HSL)
@@ -76,13 +83,15 @@ function windowResized () {
 }
 
 function mousePressed () {
-    // if (mouseButton === RIGHT) {
     lastMouseX = mouseX
-    // }
+
+    if (!bgmIsPlayed) {
+        bgm.play()
+        bgmIsPlayed = true
+    }
 }
 
 function mouseDragged () {
-    // if (mouseIsPressed && mouseButton === RIGHT) {
     if (mouseIsPressed) {
         let deltaX = mouseX - lastMouseX
         rotationY -= deltaX * rotateSpeed
@@ -93,9 +102,7 @@ function mouseDragged () {
 }
 
 function mouseReleased () {
-    // if (mouseButton === RIGHT) {
     lastMouseX = mouseX
-    // }
 }
 
 function mouseWheel (event) {
