@@ -55,8 +55,8 @@ let musicIsPlayed = false
 
 function preload () {
     soundFormats('mp3')
-    music = loadSound('/public/music.mp3')
-    font = loadFont('/public/FiraCode-Regular.ttf')
+    music = loadSound('./public/music.mp3')
+    font = loadFont('./public/FiraCode-Regular.ttf')
 }
 
 function setup () {
