@@ -13,7 +13,7 @@ I have to admit that it's pretty painful to setup collision without [p5play](htt
 
 ### Things you may try
 
-- `Q` an `E`
-- `T`
+- `I`
 - `O`
+- `P`
 - Drag and scroll
