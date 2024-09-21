@@ -11,12 +11,9 @@ I have to admit that it's pretty painful to setup collision without [p5play](htt
 - [Felix the Reaper](https://store.steampowered.com/app/919410/Felix_The_Reaper/), where player can rotate the sun for 90 degrees.
 - [Shadow Puppy Shenanigans](https://prabby-patty.itch.io/shadow-puppy-shenanigans), where player push blocks, and let the blocks' shadow do something.
 
-### You may
+### Things you may try
 
-- Try `Q` an `E`
-
-- Try `T`
-
-- Try `O`
-
-- Try orbit around world center
+- `Q` an `E`
+- `T`
+- `O`
+- Drag and scroll
