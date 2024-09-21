@@ -1,4 +1,5 @@
 // Grid 
+let strokeWidth = 1
 let blockSize = 50
 let gridSize = 9
 let floorHeight = 0
@@ -15,6 +16,8 @@ let blockStroke = [0]
 let playerFill = [0, 0, 0]
 let playerStroke = [100]
 
+let coordinateFill = [15, 100, 50]
+
 // Shadows
 let shadowFill = [30, 50, 0, 1]
 let playerShadowFill = [30, 50, 0, 1]
@@ -25,8 +28,10 @@ let sunRotation = 0
 let sunRotateSpeed = Math.PI / 2 // 90 degrees in radians
 
 // User Settings
+let useCoordinates = false
 let useOrtho = true
 let useStackedBlocks = true
+
 let useRotation = true
 let rotateSpeed = 0.001
 
@@ -35,8 +40,6 @@ let sceneScaleScrollStep = 0.0002
 let sceneScaleMin = 0.5
 let sceneScaleMax = 2
 
-let strokeWidth = 1
-
 // Runtime Variables
 let centerOffset
 let blocks = []
@@ -44,24 +47,30 @@ let playerPos
 let lastMouseX
 let rotationY = 0
 
+// Assets
 let bgmIsPlayed = false
 let bgm
-// function preload () {
-//     soundFormats('mp3')
-//     bgm = loadSound('./bgm.mp3')
-// }
+let font
+
+function preload () {
+    soundFormats('mp3')
+    bgm = loadSound('/assets/bgm.mp3')
+    font = loadFont('/assets/roboto_mono.ttf')
+}
 
 function setup () {
     createCanvas(windowWidth, windowHeight, WEBGL)
+
     colorMode(HSL)
 
-    // noCursor()
+    textFont(font)
+
     centerOffset = floor(gridSize / 2)
 
     playerPos = createVector(0, 0)
 
     blocks.push({ position: createVector(1, 1), height: 1 })
-    blocks.push({ position: createVector(2, 2), height: 2 })
+    blocks.push({ position: createVector(2, 3), height: 2 })
     blocks.push({ position: createVector(-2, 0), height: 3 })
 }
 
@@ -79,6 +88,30 @@ function draw () {
     drawBlocks()
     drawPlayer()
     drawGrid()
+    drawHint()
+}
+
+function drawHint () {
+    // Global
+    textAlign(CENTER, CENTER)
+    textSize(20)
+    fill(100)
+    translate(0, 0, 0.01)
+
+    // 1. Controls
+    push()
+    translate(0, -250, 0)
+    rotateX(-PI / 4)
+    text('Use WASD or Arrow Keys to move', 0, 0)
+    pop()
+
+    // 2. Sun Rotation
+    push()
+    translate(250, 0, 0)
+    rotateY(-PI / 4)
+    rotateZ(PI / 2)
+    text('Use Q and E to rotate the sun', 0, 0)
+    pop()
 }
 
 function windowResized () {
@@ -115,18 +148,22 @@ function mouseWheel (event) {
 }
 
 function keyPressed () {
-    // User Settings
-    if (key === 'T' || key === 't') {
-        useStackedBlocks = !useStackedBlocks
-    }
-    if (key === 'O' || key === 'o') {
-        useOrtho = !useOrtho
-    }
     if (key === 'Q' || key === 'q') {
         sunRotation -= sunRotateSpeed
     }
     if (key === 'E' || key === 'e') {
         sunRotation += sunRotateSpeed
+    }
+
+    // User Settings
+    if (key === 'I' || key === 'i') {
+        useStackedBlocks = !useStackedBlocks
+    }
+    if (key === 'O' || key === 'o') {
+        useOrtho = !useOrtho
+    }
+    if (key === 'P' || key === 'p') {
+        useCoordinates = !useCoordinates
     }
 
     // Movement
@@ -204,10 +241,21 @@ function drawGrid () {
             stroke(gridStroke)
             strokeWeight(strokeWidth)
             box(blockSize, blockSize, floorHeight)
+
+            if (useCoordinates) {
+                fill(15, 100, 50)
+                textAlign(CENTER, CENTER)
+                textSize(10)
+                noStroke()
+                translate(0, 0, floorHeight + 0.1)
+                text(`[${x},${y}]`, 0, 0)
+                // text(`${x},${y}`, 0, 0)
+            }
             pop()
         }
     }
 }
+
 
 function drawPlayer () {
     push()
