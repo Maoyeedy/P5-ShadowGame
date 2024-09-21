@@ -4,9 +4,6 @@ let blockSize = 50
 let gridSize = 9
 let floorHeight = 0
 
-// Colors
-let bgColor = [210, 100, 50]
-
 let gridFill = [0, 0, 100]
 let gridStroke = [0]
 
@@ -16,7 +13,7 @@ let blockStroke = [0]
 let playerFill = [0, 0, 0]
 let playerStroke = [100]
 
-let coordinateFill = [15, 100, 50]
+let bgColor = [210, 100, 50]
 
 // Shadows
 let shadowFill = [30, 50, 0, 1]
@@ -24,16 +21,19 @@ let playerShadowFill = [30, 50, 0, 1]
 let playerShadowLength = 1
 let enablePlayerShadow = true
 
-let sunRotation = 0
 let sunRotateSpeed = Math.PI / 2 // 90 degrees in radians
+let sunRotation = 0
 
 // User Settings
 let useCoordinates = false
+let fontCoordinateSize = 10
+let coordinateFill = [15, 100, 50]
+
 let useOrtho = true
 let useStackedBlocks = true
 
 let useRotation = true
-let rotateSpeed = 0.001
+let rotateSpeed = 0.002
 
 let sceneScale = 1
 let sceneScaleScrollStep = 0.0002
@@ -45,17 +45,18 @@ let centerOffset
 let blocks = []
 let playerPos
 let lastMouseX
-let rotationY = 0
+let rotationDelta = 0
 
 // Assets
-let bgmIsPlayed = false
-let bgm
 let font
+let fontHintSize = 16
+let music
+let musicIsPlayed = false
 
 function preload () {
     soundFormats('mp3')
-    bgm = loadSound('/assets/bgm.mp3')
-    font = loadFont('/assets/roboto_mono.ttf')
+    music = loadSound('/assets/music.mp3')
+    font = loadFont('/assets/FiraCode-Regular.ttf')
 }
 
 function setup () {
@@ -82,7 +83,8 @@ function draw () {
 
     rotateX(PI / 3)
     rotateZ(-PI / 4)
-    if (useRotation) rotateZ(rotationY)
+    if (useRotation) { rotateZ(rotationDelta) }
+    // orbitControl()
 
     drawShadows()
     drawBlocks()
@@ -91,48 +93,21 @@ function draw () {
     drawHint()
 }
 
-function drawHint () {
-    // Global
-    textAlign(CENTER, CENTER)
-    textSize(20)
-    fill(100)
-    translate(0, 0, 0.01)
-
-    // 1. Controls
-    push()
-    translate(0, -250, 0)
-    rotateX(-PI / 4)
-    text('Use WASD or Arrow Keys to move', 0, 0)
-    pop()
-
-    // 2. Sun Rotation
-    push()
-    translate(250, 0, 0)
-    rotateY(-PI / 4)
-    rotateZ(PI / 2)
-    text('Use Q and E to rotate the sun', 0, 0)
-    pop()
-}
-
 function windowResized () {
     resizeCanvas(windowWidth, windowHeight)
 }
 
 function mousePressed () {
     lastMouseX = mouseX
-
-    if (!bgmIsPlayed) {
-        bgm.play()
-        bgmIsPlayed = true
-    }
+    if (!music.isPlaying()) { music.play() }
 }
 
 function mouseDragged () {
     if (mouseIsPressed) {
         let deltaX = mouseX - lastMouseX
-        rotationY -= deltaX * rotateSpeed
+        rotationDelta -= deltaX * rotateSpeed
 
-        rotationY = constrain(rotationY, -PI / 4 + 0.01, PI / 4 - 0.01)
+        rotationDelta = constrain(rotationDelta, -PI / 4 + 0.001, PI / 4 - 0.001)
         lastMouseX = mouseX
     }
 }
@@ -193,9 +168,7 @@ function movePlayer (direction) {
 
         let canMove = handleCollision(nextPos, direction)
 
-        if (canMove) {
-            playerPos = nextPos
-        }
+        if (canMove) { playerPos = nextPos }
     }
 }
 
@@ -203,9 +176,7 @@ function movePlayer (direction) {
 function handleCollision (nextPos, pushDir) {
     let collidedBlockIndex = blocks.findIndex(block => block.position.equals(nextPos))
 
-    if (collidedBlockIndex !== -1) {
-        return pushBlock(collidedBlockIndex, pushDir)
-    }
+    if (collidedBlockIndex !== -1) { return pushBlock(collidedBlockIndex, pushDir) }
 
     return true
 }
@@ -243,9 +214,9 @@ function drawGrid () {
             box(blockSize, blockSize, floorHeight)
 
             if (useCoordinates) {
-                fill(15, 100, 50)
+                fill(coordinateFill)
                 textAlign(CENTER, CENTER)
-                textSize(10)
+                textSize(fontCoordinateSize)
                 noStroke()
                 translate(0, 0, floorHeight + 0.1)
                 text(`[${x},${y}]`, 0, 0)
@@ -303,7 +274,7 @@ function drawShadows () {
         let newX = x + length * sinAngle
         let newY = y + length * cosAngle
 
-        // Constrain shadow to within grid bounds
+        // Constrain within bounds
         newX = constrain(newX, -centerOffset - 0.5, centerOffset + 0.5)
         newY = constrain(newY, -centerOffset - 0.5, centerOffset + 0.5)
 
@@ -347,3 +318,22 @@ function drawShadows () {
     }
 }
 
+function drawHint () {
+    textAlign(CENTER, CENTER)
+    textSize(fontHintSize)
+    fill(100)
+    translate(0, 0, fontHintSize / 2)
+
+    push()
+    translate(0, -250, 0)
+    rotateX(-PI / 4)
+    text('Use WASD or Arrow Keys to move', 0, 0)
+    pop()
+
+    push()
+    translate(250, 0, 0)
+    rotateY(-PI / 4)
+    rotateZ(PI / 2)
+    text('Use Q and E to rotate the sun', 0, 0)
+    pop()
+}
