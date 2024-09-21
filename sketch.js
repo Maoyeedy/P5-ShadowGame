@@ -300,10 +300,14 @@ function drawShadows () {
     let sinAngle = sin(sunRotation)
 
     function rotateShadow (x, y, length) {
-        return {
-            x: x + length * sinAngle,
-            y: y + length * cosAngle
-        }
+        let newX = x + length * sinAngle
+        let newY = y + length * cosAngle
+
+        // Constrain shadow to within grid bounds
+        newX = constrain(newX, -centerOffset - 0.5, centerOffset + 0.5)
+        newY = constrain(newY, -centerOffset - 0.5, centerOffset + 0.5)
+
+        return { x: newX, y: newY }
     }
 
     if (enablePlayerShadow) {
@@ -342,3 +346,4 @@ function drawShadows () {
         }
     }
 }
+
