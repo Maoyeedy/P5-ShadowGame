@@ -21,6 +21,9 @@ let playerShadowFill = [30, 50, 0, 1]
 let playerShadowLength = 1
 let enablePlayerShadow = true
 
+let sunRotation = 0
+let sunRotateSpeed = Math.PI / 2 // 90 degrees in radians
+
 // User Settings
 let useOrtho = true
 let useStackedBlocks = true
@@ -43,10 +46,10 @@ let rotationY = 0
 
 let bgmIsPlayed = false
 let bgm
-function preload () {
-    soundFormats('mp3')
-    bgm = loadSound('./bgm.mp3')
-}
+// function preload () {
+//     soundFormats('mp3')
+//     bgm = loadSound('./bgm.mp3')
+// }
 
 function setup () {
     createCanvas(windowWidth, windowHeight, WEBGL)
@@ -118,6 +121,12 @@ function keyPressed () {
     }
     if (key === 'O' || key === 'o') {
         useOrtho = !useOrtho
+    }
+    if (key === 'Q' || key === 'q') {
+        sunRotation -= sunRotateSpeed
+    }
+    if (key === 'E' || key === 'e') {
+        sunRotation += sunRotateSpeed
     }
 
     // Movement
@@ -234,39 +243,53 @@ function drawBlocks () {
     }
 }
 
+
 function drawShadows () {
     noStroke()
 
+    // Calculate rotation matrix
+    let cosAngle = cos(sunRotation)
+    let sinAngle = sin(sunRotation)
+
+    function rotateShadow (x, y, length) {
+        return {
+            x: x + length * sinAngle,
+            y: y + length * cosAngle
+        }
+    }
+
     if (enablePlayerShadow) {
-        let playerShadowEnd = constrain(playerPos.y + playerShadowLength, -centerOffset, centerOffset)
-        let actualPlayerShadowLength = playerShadowEnd - playerPos.y
+        let playerShadowEnd = rotateShadow(playerPos.x, playerPos.y, playerShadowLength + 0.5)
+        let actualPlayerShadowLength = dist(playerPos.x, playerPos.y, playerShadowEnd.x, playerShadowEnd.y)
 
         if (actualPlayerShadowLength > 0) {
             push()
             fill(playerShadowFill)
             translate(
-                playerPos.x * blockSize,
-                (playerPos.y + actualPlayerShadowLength / 2 + 0.5) * blockSize,
+                (playerPos.x + playerShadowEnd.x) / 2 * blockSize,
+                (playerPos.y + playerShadowEnd.y) / 2 * blockSize,
                 floorHeight * 0.5 + 0.01
             )
-            box(blockSize, actualPlayerShadowLength * blockSize, 0)
+            rotateZ(atan2(playerShadowEnd.y - playerPos.y, playerShadowEnd.x - playerPos.x))
+            box(actualPlayerShadowLength * blockSize, blockSize, 0)
             pop()
         }
     }
 
     for (let block of blocks) {
-        let shadowEnd = constrain(block.position.y + block.height, -centerOffset, centerOffset)
-        let actualShadowLength = shadowEnd - block.position.y
+        let shadowEnd = rotateShadow(block.position.x, block.position.y, block.height + 0.5)
+        let actualShadowLength = dist(block.position.x, block.position.y, shadowEnd.x, shadowEnd.y)
 
         if (actualShadowLength > 0) {
             push()
             fill(shadowFill)
             translate(
-                block.position.x * blockSize,
-                (block.position.y + actualShadowLength / 2 + 0.5) * blockSize,
+                (block.position.x + shadowEnd.x) / 2 * blockSize,
+                (block.position.y + shadowEnd.y) / 2 * blockSize,
                 floorHeight * 0.5 + 0.02
             )
-            box(blockSize, actualShadowLength * blockSize, 0)
+            rotateZ(atan2(shadowEnd.y - block.position.y, shadowEnd.x - block.position.x))
+            box(actualShadowLength * blockSize, blockSize, 0)
             pop()
         }
     }
