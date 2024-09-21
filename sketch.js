@@ -28,7 +28,7 @@ let useRotation = true
 let rotateSpeed = 0.001
 
 let sceneScale = 1
-let sceneScaleScrollStep = 0.001
+let sceneScaleScrollStep = 0.0002
 let sceneScaleMin = 0.5
 let sceneScaleMax = 2
 
@@ -76,13 +76,14 @@ function windowResized () {
 }
 
 function mousePressed () {
-    if (mouseButton === RIGHT) {
-        lastMouseX = mouseX
-    }
+    // if (mouseButton === RIGHT) {
+    lastMouseX = mouseX
+    // }
 }
 
 function mouseDragged () {
-    if (mouseIsPressed && mouseButton === RIGHT) {
+    // if (mouseIsPressed && mouseButton === RIGHT) {
+    if (mouseIsPressed) {
         let deltaX = mouseX - lastMouseX
         rotationY -= deltaX * rotateSpeed
 
@@ -92,9 +93,9 @@ function mouseDragged () {
 }
 
 function mouseReleased () {
-    if (mouseButton === RIGHT) {
-        lastMouseX = mouseX
-    }
+    // if (mouseButton === RIGHT) {
+    lastMouseX = mouseX
+    // }
 }
 
 function mouseWheel (event) {
