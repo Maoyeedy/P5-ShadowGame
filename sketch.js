@@ -25,13 +25,14 @@ let enablePlayerShadow = true
 let useOrtho = true
 let useStackedBlocks = true
 let useRotation = true
+let rotateSpeed = 0.001
 
-let rotateSpeed = 0.01
-let strokeWidth = 1
 let sceneScale = 1
 let sceneScaleScrollStep = 0.001
 let sceneScaleMin = 0.5
 let sceneScaleMax = 2
+
+let strokeWidth = 1
 
 // Runtime Variables
 let centerOffset
