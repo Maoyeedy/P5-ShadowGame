@@ -28,7 +28,7 @@ The game can either be played with one or two players.
 
 #### 🛠️ Extra Utilities
 - Drag and scroll with your mouse
-- `O` to switch orthographic/perspective view
+- `O` to switch between orthographic/perspective
 - `R` to restart
 
 ## 💡Inspirations
