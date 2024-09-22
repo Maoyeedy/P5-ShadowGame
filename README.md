@@ -22,14 +22,14 @@ The game can either be played with one or two players.
 #### ⌨️ Controls
 <!-- - *WASD* moves the **Black Cube**. -->
 <!-- - *Arrow keys* moves the **White Cube**. -->
-- `W`, `A`, `S`, `D` move the **Black Cube**.
-- `↑`, `←`, `↓`, `→` move the **White Cube**.
+- `W`, `A`, `S`, `D` moves the **Black Cube**.
+- `↑`, `←`, `↓`, `→` moves the **White Cube**.
 - `Q`, `E` rotates the sun.
 
 #### 🛠️ Extra Utilities
 - Drag and scroll with your mouse
-- `I`,`O`,`P` 
-- `R` to reload
+- `I`,`O`,`P` for debug settings
+- `R` for reloading
 
 ## 💡Inspirations
 
