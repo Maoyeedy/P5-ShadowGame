@@ -391,7 +391,7 @@ function drawGrid () {
 }
 function drawPlayer (pos, fillColor, strokeColor) {
     push()
-    translate(pos.x * blockSize, pos.y * blockSize, blockSize / 2)
+    translate(pos.x * blockSize, pos.y * blockSize, blockSize / 2 + 0.001)
     fill(fillColor)
     stroke(strokeColor)
     strokeWeight(strokeWidth)
