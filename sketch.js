@@ -23,7 +23,7 @@ let targetStrokeWidth = 1
 let shadowFill = [30, 50, 0, 1]
 let playerShadowFill = [30, 50, 0, 1]
 let playerShadowLength = 1
-let enablePlayerShadow = true
+let enablePlayerShadow = false
 
 let sunRotateSpeed = Math.PI / 2 // 90 degrees in radians
 let sunRotation = 0
@@ -77,7 +77,7 @@ function setup () {
 
     blocks.push({ position: createVector(0, -3), height: 4 })
     blocks.push({ position: createVector(3, -2), height: 3 })
-    blocks.push({ position: createVector(2, 3), height: 4 })
+    blocks.push({ position: createVector(2, 3), height: 5 })
     // blocks.push({ position: createVector(-2, 0), height: 3 })
 }
 
@@ -137,6 +137,10 @@ function keyPressed () {
         sunRotation += sunRotateSpeed
     }
 
+    if (key === 'R' || key === 'r') {
+        location.reload() // Reload the page when 'R' is pressed
+    }
+
     // User Settings
     if (key === 'I' || key === 'i') {
         useStackedBlocks = !useStackedBlocks
@@ -173,10 +177,38 @@ function movePlayer (direction) {
     if (nextPos.x >= -centerOffset && nextPos.x <= centerOffset &&
         nextPos.y >= -centerOffset && nextPos.y <= centerOffset) {
 
+        let inShadow = isInShadow(nextPos)
         let canMove = handleCollision(nextPos, direction)
 
-        if (canMove) { playerPos = nextPos }
+        // Check if the player is within a shadow
+
+        if (canMove && inShadow) {
+            playerPos = nextPos
+        }
     }
+}
+
+function isInShadow (position) {
+    // Calculate rotation matrix
+    let cosAngle = cos(sunRotation)
+    let sinAngle = sin(sunRotation)
+
+    for (let block of blocks) {
+        let shadowEnd = createVector(
+            block.position.x + (block.height + 0.5) * sinAngle,
+            block.position.y + (block.height + 0.5) * cosAngle
+        )
+
+        // Check if the player's position falls within the shadow's bounds
+        if (position.x >= min(block.position.x, shadowEnd.x) &&
+            position.x <= max(block.position.x, shadowEnd.x) &&
+            position.y >= min(block.position.y, shadowEnd.y) &&
+            position.y <= max(block.position.y, shadowEnd.y)) {
+            return true // Player is in the shadow
+        }
+    }
+
+    return false // Player is not in the shadow
 }
 
 
