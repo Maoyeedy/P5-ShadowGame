@@ -28,8 +28,9 @@ The game can either be played with one or two players.
 
 #### 🛠️ Extra Utilities
 - Drag and scroll with your mouse
-- `I`,`O`,`P` for debug settings
-- `R` for reloading
+<!-- - `I`,`O`,`P` for debug settings -->
+- `O` to switch orthographic/perspective view
+- `R` to restart
 
 ## 💡Inspirations
 
