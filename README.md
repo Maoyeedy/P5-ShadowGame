@@ -1,23 +1,44 @@
 # [🎮 Play the Game!](https://maoyeedy.github.io/P5-ShadowGame/)
 
-*The game is for a 24-hour gamejam, and is still in progress.*
+### 🕹️ About the Game
+The game was for [a 24-hours gamejam](https://itch.io/jam/equinox-game-jam).
 
 I'm completely new to [p5.js](https://p5js.org/) and I'm learning as I go.
 
-I have to admit that it's pretty painful to setup collision without [p5play](https://http://p5play.org/).
+<!-- It's pretty painful to setup collision without [p5play](https://http://p5play.org/). -->
 
-### Reference
+## 🌞 Gameplay
 
-- [Felix the Reaper](https://store.steampowered.com/app/919410/Felix_The_Reaper/), where player can rotate the sun for 90 degrees.
-- [Shadow Puppy Shenanigans](https://prabby-patty.itch.io/shadow-puppy-shenanigans), where player push blocks, and let the blocks' shadow do something.
+The game can either be played with one player or two players.
 
-### Things you may try
+<!-- #### 🚧 Mechanics:
+- **Black Cube** can only move within the shadows.
+- **White Cube** can push blocks but cannot enter the shadows. -->
 
-- Drag and scroll
-- `I`
-- `O`
-- `P`
+#### 🎯 Objective:
+<!-- - **Black Cube** must navigate through the shadowed blocks and reach the final target to win. -->
+- **Black Cube** reaches the final target.
+
+#### ⌨️ Controls:
+<!-- - *WASD* moves the **Black Cube**. -->
+<!-- - *Arrow keys* moves the **White Cube**. -->
+- `W`, `A`, `S`, `D` move the **Black Cube**.
+- `↑`, `←`, `↓`, `→` move the **White Cube**.
+- `Q`, `E` rotates the sun.
+
+#### 🛠️ Other Utilities
+- Drag and scroll with your mouse
+- `I`,`O`,`P` 
 - `R` to reload
+
+## 💡Inspirations
+
+- [Felix the Reaper](https://store.steampowered.com/app/919410/Felix_The_Reaper/), where sun can rotate for 90 degrees.
+- [Shadow Puppy Shenanigans](https://prabby-patty.itch.io/shadow-puppy-shenanigans), where blocks' shadow can do something.
 
 <!-- ### Notes -->
 <!-- I made a bug, which lead to player1 not able to push blocks, but turns out it works better. So now, player1 can only walk in shadow, and player2 can only push blocks. -->
+
+## 📝 To-Do
+- [x] Make collision affect the other player
+- [x] Add sun rotation check, just like Felix the Reaper
