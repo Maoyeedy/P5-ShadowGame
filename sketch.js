@@ -29,8 +29,14 @@ let playerShadowFill = [30, 50, 0, 1]
 let playerShadowLength = 1
 let enablePlayerShadow = false
 
-let sunRotateSpeed = Math.PI / 2 // 90 degrees in radians
+let sunRotateAngle = Math.PI / 2
+let sunRotationDuration = 250
+
 let sunRotation = 0
+let targetSunRotation = 0
+
+let sunRotationStartTime = 0
+let isSunRotating = false
 
 // User Settings
 let useCoordinates = false
@@ -114,10 +120,22 @@ function setup () {
 function draw () {
     background(bgColor)
 
+    if (isSunRotating) {
+        let elapsedTime = millis() - sunRotationStartTime
+
+        if (elapsedTime < sunRotationDuration) {
+            let t = elapsedTime / sunRotationDuration
+            sunRotation = lerp(sunRotation, targetSunRotation, t)
+        } else {
+            sunRotation = targetSunRotation
+            isSunRotating = false
+        }
+        calculateSunAngle()
+    }
+
     DrawMessage()
 
-    // Camera Offset
-    translate(0, blockSize, 0)
+    translate(0, blockSize, 0) // Camera Offset
 
     if (useOrtho) { ortho() } else { perspective() }
     scale(sceneScale)
@@ -134,6 +152,7 @@ function draw () {
     drawHint()
     drawTarget(targetPosition.x, targetPosition.y)
 }
+
 function tryPlayAudio (audio) {
     if (!audio.isPlaying()) { audio.play() }
 }
@@ -174,12 +193,15 @@ function mouseWheel (event) {
 }
 
 function keyPressed () {
-    if (key === 'Q' || key === 'q') {
-        rotateSun(-1)
+    if (!isSunRotating) {
+        if (key === 'Q' || key === 'q') {
+            rotateSun(-1)
+        }
+        if (key === 'E' || key === 'e') {
+            rotateSun(1)
+        }
     }
-    if (key === 'E' || key === 'e') {
-        rotateSun(1)
-    }
+
     if (key === 'R' || key === 'r') {
         location.reload()
     }
@@ -234,15 +256,20 @@ function calculateSunAngle () {
 }
 
 function rotateSun (direction) {
-    sunRotation += direction * sunRotateSpeed
-    calculateSunAngle()
-
-    // if (!isInShadow(player1Pos)) {
-    //     sunRotation -= direction * sunRotateSpeed
-    //     calculateSunAngle()
-    //     ResetMessage('This rotation will make player outside shadow.', 2000)
-    // }
+    targetSunRotation = sunRotation + direction * sunRotateAngle
+    sunRotationStartTime = millis()
+    isSunRotating = true
 }
+// function rotateSun (direction) {
+//     sunRotation += direction * sunRotateAngle
+//     calculateSunAngle()
+
+//     // if (!isInShadow(player1Pos)) {
+//     //     sunRotation -= direction * sunRotateAngle
+//     //     calculateSunAngle()
+//     //     ResetMessage('This rotation will make player outside shadow.', 2000)
+//     // }
+// }
 
 function isInShadow (position) {
     for (let block of blocks) {
