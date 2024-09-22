@@ -29,6 +29,8 @@ let sunRotateSpeed = Math.PI / 2 // 90 degrees in radians
 let sunRotation = 0
 
 // User Settings
+let playMusic = false
+
 let useCoordinates = false
 let fontCoordinateSize = 10
 let coordinateFill = [15, 100, 50]
@@ -48,6 +50,7 @@ let sceneScaleMax = 2
 let centerOffset
 let blocks = []
 let playerPos
+let nextPos
 let lastMouseX
 let rotationDelta = 0
 
@@ -58,10 +61,12 @@ let music
 let musicIsPlayed = false
 
 function preload () {
-    // soundFormats('mp3')
-    // music = loadSound('./assets/music.mp3')
-    font = loadFont('./assets/FiraCode-Regular.ttf')
     // should always use relative path for github pages
+    font = loadFont('./assets/FiraCode-Regular.ttf')
+    if (playMusic) {
+        soundFormats('mp3')
+        music = loadSound('./assets/music.mp3')
+    }
 }
 
 function setup () {
@@ -106,7 +111,9 @@ function windowResized () {
 
 function mousePressed () {
     lastMouseX = mouseX
-    if (!music.isPlaying()) { music.play() }
+    if (playMusic) {
+        if (!music.isPlaying()) { music.play() }
+    }
 }
 
 function mouseDragged () {
@@ -130,11 +137,18 @@ function mouseWheel (event) {
 }
 
 function keyPressed () {
+    console.log(nextPos)
     if (key === 'Q' || key === 'q') {
         sunRotation -= sunRotateSpeed
+        if (!isInShadow(playerPos)) {
+            sunRotation += sunRotateSpeed
+        }
     }
     if (key === 'E' || key === 'e') {
         sunRotation += sunRotateSpeed
+        if (!isInShadow(playerPos)) {
+            sunRotation -= sunRotateSpeed
+        }
     }
 
     if (key === 'R' || key === 'r') {
@@ -171,7 +185,7 @@ function keyPressed () {
 }
 
 function movePlayer (direction) {
-    let nextPos = playerPos.copy().add(direction)
+    nextPos = playerPos.copy().add(direction)
 
     // Check if the move is within bounds
     if (nextPos.x >= -centerOffset && nextPos.x <= centerOffset &&
