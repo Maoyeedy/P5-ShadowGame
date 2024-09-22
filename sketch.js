@@ -185,16 +185,11 @@ function keyPressed () {
 }
 
 function movePlayer (direction) {
-    nextPos = playerPos.copy().add(direction)
-
-    // Check if the move is within bounds
     if (nextPos.x >= -centerOffset && nextPos.x <= centerOffset &&
         nextPos.y >= -centerOffset && nextPos.y <= centerOffset) {
 
         let inShadow = isInShadow(nextPos)
         let canMove = handleCollision(nextPos, direction)
-
-        // Check if the player is within a shadow
 
         if (canMove && inShadow) {
             playerPos = nextPos
@@ -203,7 +198,6 @@ function movePlayer (direction) {
 }
 
 function isInShadow (position) {
-    // Calculate rotation matrix
     let cosAngle = cos(sunRotation)
     let sinAngle = sin(sunRotation)
 
@@ -213,16 +207,15 @@ function isInShadow (position) {
             block.position.y + (block.height + 0.5) * cosAngle
         )
 
-        // Check if the player's position falls within the shadow's bounds
         if (position.x >= min(block.position.x, shadowEnd.x) &&
             position.x <= max(block.position.x, shadowEnd.x) &&
             position.y >= min(block.position.y, shadowEnd.y) &&
             position.y <= max(block.position.y, shadowEnd.y)) {
-            return true // Player is in the shadow
+            return true
         }
     }
 
-    return false // Player is not in the shadow
+    return false
 }
 
 
@@ -238,12 +231,12 @@ function pushBlock (blockIndex, pushDir) {
     let block = blocks[blockIndex]
     let newPos = block.position.copy().add(pushDir)
 
-    // Check if the new position is within the grid
+    // Check if the new position is within bounds
     if (newPos.x < -centerOffset || newPos.x > centerOffset || newPos.y < -centerOffset || newPos.y > centerOffset) {
         return false
     }
 
-    // Check if there's another block at the new position
+    // Check if there's block at new position
     let nextBlockIndex = blocks.findIndex(b => b.position.equals(newPos))
     if (nextBlockIndex !== -1) {
         // Try to push the next block
@@ -319,7 +312,6 @@ function drawBlocks () {
 function drawShadows () {
     noStroke()
 
-    // Calculate rotation matrix
     let cosAngle = cos(sunRotation)
     let sinAngle = sin(sunRotation)
 
@@ -327,7 +319,7 @@ function drawShadows () {
         let newX = x + length * sinAngle
         let newY = y + length * cosAngle
 
-        // Constrain within bounds
+        // Constrain shadow within bounds
         newX = constrain(newX, -centerOffset - 0.5, centerOffset + 0.5)
         newY = constrain(newY, -centerOffset - 0.5, centerOffset + 0.5)
 
@@ -397,7 +389,7 @@ function drawHint () {
 
 function drawTarget (x, y, radius) {
     push()
-    translate(x * blockSize, y * blockSize, floorHeight + 0.2) // Set close to floor level
+    translate(x * blockSize, y * blockSize, floorHeight + 0.2)
     fill(targetColor)
     stroke(targetStroke)
     strokeWeight(targetStrokeWidth)
