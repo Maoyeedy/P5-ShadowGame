@@ -34,7 +34,7 @@ The game can either be played with one or two players.
 ## 💡Inspirations
 
 - [Felix the Reaper](https://store.steampowered.com/app/919410/Felix_The_Reaper/), where sun can rotate for 90 degrees.
-- [Shadow Puppy Shenanigans](https://prabby-patty.itch.io/shadow-puppy-shenanigans), where blocks' shadow can do something.
+- [Shadow Puppy Shenanigans](https://prabby-patty.itch.io/shadow-puppy-shenanigans), where blocks' shadow can affect the world.
 
 <!-- ### Notes -->
 <!-- I made a bug, which lead to player1 not able to push blocks, but turns out it works better. So now, player1 can only walk in shadow, and player2 can only push blocks. -->
