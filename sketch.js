@@ -55,8 +55,9 @@ let musicIsPlayed = false
 
 function preload () {
     soundFormats('mp3')
-    music = loadSound('./public/music.mp3')
-    font = loadFont('./public/FiraCode-Regular.ttf')
+    music = loadSound('./assets/music.mp3')
+    font = loadFont('./assets/FiraCode-Regular.ttf')
+    // always use relative path for github pages
 }
 
 function setup () {
