@@ -1,5 +1,5 @@
 // Grid 
-let strokeWidth = 1
+let strokeWidth = 2
 let blockSize = 50
 let gridSize = 9
 let floorHeight = 0
@@ -46,7 +46,7 @@ let rotateSpeed = 0.002
 let sceneScale = 1
 let sceneScaleScrollStep = 0.0002
 let sceneScaleMin = 0.5
-let sceneScaleMax = 1.75
+let sceneScaleMax = 2
 
 // Runtime Variables
 let centerOffset
