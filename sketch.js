@@ -1,5 +1,5 @@
 // Grid 
-let strokeWidth = 2
+let strokeWidth = 1
 let blockSize = 50
 let gridSize = 9
 let floorHeight = 0
