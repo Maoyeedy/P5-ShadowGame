@@ -18,3 +18,6 @@ I have to admit that it's pretty painful to setup collision without [p5play](htt
 - `O`
 - `P`
 - `R` to reload
+
+<!-- ### Notes -->
+<!-- I made a bug, which lead to player1 not able to push blocks, but turns out it works better. So now, player1 can only walk in shadow, and player2 can only push blocks. -->

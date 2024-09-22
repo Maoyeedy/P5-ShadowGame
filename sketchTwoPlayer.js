@@ -105,10 +105,10 @@ function setup () {
     player2Pos = createVector(-3, -3)
 
     blocks.push({ position: createVector(0, -3), height: 4 })
-    blocks.push({ position: createVector(3, -2), height: 3 })
-    blocks.push({ position: createVector(2, 3), height: 5 })
+    blocks.push({ position: createVector(3, -1), height: 3 })
+    blocks.push({ position: createVector(2, 4), height: 5 })
 
-    targetPosition = createVector(3, 4)
+    targetPosition = createVector(4, 4)
 }
 
 function draw () {
@@ -156,7 +156,8 @@ function mouseDragged () {
         let deltaX = mouseX - lastMouseX
         rotationDelta -= deltaX * rotateSpeed
 
-        rotationDelta = constrain(rotationDelta, -PI / 4 + 0.001, PI / 4 - 0.001)
+        // rotationDelta = constrain(rotationDelta, -PI / 4 + 0.001, PI / 4 - 0.001)
+        rotationDelta = constrain(rotationDelta, -PI / 2, PI / 2)
         lastMouseX = mouseX
     }
 }
@@ -335,6 +336,7 @@ function updatePlayerPosition (currentPos, nextPos, isPlayer1) {
     }
 }
 
+// https://poe.com/chat/3lttxnlbs7wkmiybel1 to make collision work on the other player
 function handleCollision (nextPos, pushDir) {
     let collidedBlockIndex = blocks.findIndex(block => block.position.equals(nextPos))
 
