@@ -18,6 +18,8 @@ let playerStroke = [100]
 let targetColor = [210, 100, 50]
 let targetStroke = [0]
 let targetStrokeWidth = 1
+let targetPosition
+let targetRadius = 1
 
 // Shadows
 let shadowFill = [30, 50, 0, 1]
@@ -29,7 +31,7 @@ let sunRotateSpeed = Math.PI / 2 // 90 degrees in radians
 let sunRotation = 0
 
 // User Settings
-let playMusic = true
+let enableMusic = true
 
 let useCoordinates = false
 let fontCoordinateSize = 10
@@ -53,19 +55,55 @@ let playerPos
 let nextPos
 let lastMouseX
 let rotationDelta = 0
+let cosAngle
+let sinAngle
 
 // Assets
 let font
 let fontHintSize = 16
 let music
 let musicIsPlayed = false
+let finishSFX
+
+// Message
+let message = ''
+let messageDuration = 0
+let messageColor = [0, 0, 100]
+let messageSize = 24
+
+function ResetMessage (newMessage, duration) {
+    message = newMessage
+    messageDuration = duration
+}
+
+function DrawMessage () {
+    if (messageDuration > 0) {
+        messageDuration -= deltaTime
+    } else {
+        message = ''
+    }
+
+    push()
+    textSize(messageSize)
+    textAlign(CENTER, CENTER)
+    fill(messageColor)
+    text(message, 0, 300)
+    pop()
+}
 
 function preload () {
     // should always use relative path for github pages
     font = loadFont('./assets/FiraCode-Regular.ttf')
-    if (playMusic) {
+    if (enableMusic) {
         soundFormats('mp3')
         music = loadSound('./assets/music.mp3')
+        finishSFX = loadSound('./assets/SFXfinish.mp3')
+    }
+}
+
+function tryPlayMusic () {
+    if (enableMusic) {
+        if (!music.isPlaying()) { music.play() }
     }
 }
 
@@ -78,12 +116,25 @@ function setup () {
 
     centerOffset = floor(gridSize / 2)
 
+    calculateSunAngle()
+
     playerPos = createVector(0, 0)
 
     blocks.push({ position: createVector(0, -3), height: 4 })
     blocks.push({ position: createVector(3, -2), height: 3 })
     blocks.push({ position: createVector(2, 3), height: 5 })
     // blocks.push({ position: createVector(-2, 0), height: 3 })
+    targetPosition = createVector(2, 2)
+
+    music.setVolume(0.1)
+    finishSFX.setVolume(1)
+}
+
+function levelComplete () {
+    ResetMessage('Level Finished!', 10000)
+    if (enableMusic && !finishSFX.isPlaying()) {
+        finishSFX.play()
+    }
 }
 
 function draw () {
@@ -91,6 +142,8 @@ function draw () {
     scale(sceneScale)
 
     if (useOrtho) { ortho() } else { perspective() }
+
+    DrawMessage()
 
     rotateX(PI / 3)
     rotateZ(-PI / 4)
@@ -102,7 +155,7 @@ function draw () {
     drawPlayer()
     drawGrid()
     drawHint()
-    drawTarget(2, 2, 1)
+    drawTarget(targetPosition.x, targetPosition.y)
 }
 
 function windowResized () {
@@ -111,9 +164,6 @@ function windowResized () {
 
 function mousePressed () {
     lastMouseX = mouseX
-    if (playMusic) {
-        if (!music.isPlaying()) { music.play() }
-    }
 }
 
 function mouseDragged () {
@@ -137,18 +187,13 @@ function mouseWheel (event) {
 }
 
 function keyPressed () {
-    console.log(nextPos)
+    tryPlayMusic()
+
     if (key === 'Q' || key === 'q') {
-        sunRotation -= sunRotateSpeed
-        if (!isInShadow(playerPos)) {
-            sunRotation += sunRotateSpeed
-        }
+        rotateSun(-1)
     }
     if (key === 'E' || key === 'e') {
-        sunRotation += sunRotateSpeed
-        if (!isInShadow(playerPos)) {
-            sunRotation -= sunRotateSpeed
-        }
+        rotateSun(1)
     }
 
     if (key === 'R' || key === 'r') {
@@ -184,22 +229,24 @@ function keyPressed () {
     }
 }
 
-function movePlayer (direction) {
-    if (nextPos.x >= -centerOffset && nextPos.x <= centerOffset &&
-        nextPos.y >= -centerOffset && nextPos.y <= centerOffset) {
+function calculateSunAngle () {
+    cosAngle = cos(sunRotation)
+    sinAngle = sin(sunRotation)
+}
 
-        let inShadow = isInShadow(nextPos)
-        let canMove = handleCollision(nextPos, direction)
+function rotateSun (direction) {
+    sunRotation += direction * sunRotateSpeed
+    calculateSunAngle()
 
-        if (canMove && inShadow) {
-            playerPos = nextPos
-        }
+    if (!isInShadow(playerPos)) {
+        sunRotation -= direction * sunRotateSpeed
+        calculateSunAngle()
+        ResetMessage('This rotation will make player outside shadow.', 2000)
     }
 }
 
 function isInShadow (position) {
-    let cosAngle = cos(sunRotation)
-    let sinAngle = sin(sunRotation)
+
 
     for (let block of blocks) {
         let shadowEnd = createVector(
@@ -218,6 +265,25 @@ function isInShadow (position) {
     return false
 }
 
+function movePlayer (direction) {
+    nextPos = playerPos.copy().add(direction)
+    if (nextPos.x >= -centerOffset && nextPos.x <= centerOffset &&
+        nextPos.y >= -centerOffset && nextPos.y <= centerOffset) {
+
+        let inShadow = isInShadow(nextPos)
+        let canMove = handleCollision(nextPos, direction)
+
+        if (!canMove) { ResetMessage('Cannot move out of bounds.', 2000) }
+        if (!inShadow) { ResetMessage('Cannot move outside shadow.', 2000) }
+
+        if (canMove && inShadow) {
+            playerPos = nextPos
+            if (playerPos.equals(targetPosition)) {
+                levelComplete()
+            }
+        }
+    }
+}
 
 function handleCollision (nextPos, pushDir) {
     let collidedBlockIndex = blocks.findIndex(block => block.position.equals(nextPos))
@@ -312,9 +378,6 @@ function drawBlocks () {
 function drawShadows () {
     noStroke()
 
-    let cosAngle = cos(sunRotation)
-    let sinAngle = sin(sunRotation)
-
     function rotateShadow (x, y, length) {
         let newX = x + length * sinAngle
         let newY = y + length * cosAngle
@@ -387,13 +450,13 @@ function drawHint () {
     pop()
 }
 
-function drawTarget (x, y, radius) {
+function drawTarget (x, y) {
     push()
     translate(x * blockSize, y * blockSize, floorHeight + 0.2)
     fill(targetColor)
     stroke(targetStroke)
     strokeWeight(targetStrokeWidth)
-    ellipse(0, 0, radius * blockSize)
+    ellipse(0, 0, targetRadius * blockSize)
     pop()
 }
 

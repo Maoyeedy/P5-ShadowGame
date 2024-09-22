@@ -13,7 +13,8 @@ I have to admit that it's pretty painful to setup collision without [p5play](htt
 
 ### Things you may try
 
+- Drag and scroll
 - `I`
 - `O`
 - `P`
-- Drag and scroll
+- `R` to reload
