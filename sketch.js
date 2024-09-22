@@ -106,11 +106,15 @@ function setup () {
 
 function draw () {
     background(bgColor)
+
+    // Camera Offset
+    translate(0, blockSize, 0)
+
     scale(sceneScale)
 
-    if (useOrtho) { ortho() } else { perspective() }
-
     DrawMessage()
+
+    if (useOrtho) { ortho() } else { perspective() }
 
     rotateX(PI / 3)
     rotateZ(-PI / 4)

@@ -14,7 +14,7 @@ let blockStroke = [0]
 
 let player1Fill = [0, 0, 0]
 let player1Stroke = [100]
-let player2Fill = [0, 100, 100]
+let player2Fill = [0, 0, 90]
 let player2Stroke = [0]
 
 let targetColor = [210, 100, 50]
@@ -48,7 +48,7 @@ let rotateSpeed = 0.002
 let sceneScale = 1
 let sceneScaleScrollStep = 0.0002
 let sceneScaleMin = 0.5
-let sceneScaleMax = 2
+let sceneScaleMax = 1.75
 
 // Runtime Variables
 let centerOffset
@@ -73,6 +73,17 @@ let message = ''
 let messageDuration = 0
 let messageColor = [0, 0, 100]
 let messageSize = 24
+let messagePosY = 350
+
+function preload () {
+    // should always use relative path for github pages
+    font = loadFont('./assets/FiraCode-Regular.ttf')
+    if (enableMusic) {
+        soundFormats('mp3')
+        music = loadSound('./assets/music.mp3')
+        finishSFX = loadSound('./assets/SFXfinish.mp3')
+    }
+}
 
 function setup () {
     music.setVolume(0.1)
@@ -98,14 +109,28 @@ function setup () {
     targetPosition = createVector(2, 2)
 }
 
-function preload () {
-    // should always use relative path for github pages
-    font = loadFont('./assets/FiraCode-Regular.ttf')
-    if (enableMusic) {
-        soundFormats('mp3')
-        music = loadSound('./assets/music.mp3')
-        finishSFX = loadSound('./assets/SFXfinish.mp3')
-    }
+function draw () {
+    background(bgColor)
+
+    DrawMessage()
+
+    // Camera Offset
+    translate(0, blockSize, 0)
+
+    if (useOrtho) { ortho() } else { perspective() }
+    scale(sceneScale)
+
+    rotateX(PI / 3)
+    rotateZ(-PI / 4)
+    if (useRotation) { rotateZ(rotationDelta) }
+
+    drawShadows()
+    drawBlocks()
+    drawPlayer(player1Pos, player1Fill, player1Stroke)
+    drawPlayer(player2Pos, player2Fill, player2Stroke)
+    drawGrid()
+    drawHint()
+    drawTarget(targetPosition.x, targetPosition.y)
 }
 
 function tryPlayMusic () {
@@ -119,27 +144,6 @@ function levelComplete () {
     if (enableMusic && !finishSFX.isPlaying()) {
         finishSFX.play()
     }
-}
-
-function draw () {
-    background(bgColor)
-    scale(sceneScale)
-
-    if (useOrtho) { ortho() } else { perspective() }
-
-    DrawMessage()
-
-    rotateX(PI / 3)
-    rotateZ(-PI / 4)
-    if (useRotation) { rotateZ(rotationDelta) }
-
-    drawShadows()
-    drawBlocks()
-    drawPlayer(player1Pos, player1Fill, player1Stroke)
-    drawPlayer(player2Pos, player2Fill, player2Stroke)
-    drawGrid()
-    drawHint()
-    drawTarget(targetPosition.x, targetPosition.y)
 }
 
 function windowResized () {
@@ -268,6 +272,7 @@ function movePlayer (playerPos, direction, isPlayer1) {
     if (nextPos.x >= -centerOffset && nextPos.x <= centerOffset &&
         nextPos.y >= -centerOffset && nextPos.y <= centerOffset) {
 
+        // must first push then check shadow
         let canMove = handleCollision(nextPos, direction)
         let inShadow = isInShadow(nextPos)
 
@@ -482,6 +487,6 @@ function DrawMessage () {
     textSize(messageSize)
     textAlign(CENTER, CENTER)
     fill(messageColor)
-    text(message, 0, 300)
+    text(message, 0, messagePosY)
     pop()
 }
