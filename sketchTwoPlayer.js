@@ -33,8 +33,6 @@ let sunRotateSpeed = Math.PI / 2 // 90 degrees in radians
 let sunRotation = 0
 
 // User Settings
-let enableMusic = true
-
 let useCoordinates = false
 let fontCoordinateSize = 10
 let coordinateFill = [15, 100, 50]
@@ -63,30 +61,34 @@ let sinAngleSun
 
 // Assets
 let font
-let fontHintSize = 16
+let hintSize = 16
 let music
 let musicIsPlayed = false
 let finishSFX
+let errorSFX
 
 // Message
 let message = ''
 let messageDuration = 0
 let messageColor = [0, 0, 100]
-let messageSize = 24
-let messagePosY = 350
+let messageSize = 20
+let messagePosY = 375
 
 function preload () {
     // should always use relative path for github pages
     font = loadFont('./assets/FiraCode-Regular.ttf')
-    if (enableMusic) {
-        soundFormats('mp3')
-        music = loadSound('./assets/music.mp3')
-        finishSFX = loadSound('./assets/SFXfinish.mp3')
-    }
+
+    soundFormats('mp3')
+    music = loadSound('./assets/music.mp3')
+    finishSFX = loadSound('./assets/SFXfinish.mp3')
+    // errorSFX = loadSound('./assets/SFXerror.mp3')
+    // errorSFX = loadSound('./assets/SFXerrorUI.mp3')
+    errorSFX = loadSound('./assets/SFXmistake.mp3')
 }
 
 function setup () {
     music.setVolume(0.1)
+    errorSFX.setVolume(1)
     finishSFX.setVolume(1)
 
     createCanvas(windowWidth, windowHeight, WEBGL)
@@ -106,7 +108,7 @@ function setup () {
     blocks.push({ position: createVector(3, -2), height: 3 })
     blocks.push({ position: createVector(2, 3), height: 5 })
 
-    targetPosition = createVector(2, 2)
+    targetPosition = createVector(3, 4)
 }
 
 function draw () {
@@ -132,18 +134,13 @@ function draw () {
     drawHint()
     drawTarget(targetPosition.x, targetPosition.y)
 }
-
-function tryPlayMusic () {
-    if (enableMusic) {
-        if (!music.isPlaying()) { music.play() }
-    }
+function tryPlayAudio (audio) {
+    if (!audio.isPlaying()) { audio.play() }
 }
 
-function levelComplete () {
+function levelFinish () {
     ResetMessage('Level Finished!', 10000)
-    if (enableMusic && !finishSFX.isPlaying()) {
-        finishSFX.play()
-    }
+    tryPlayAudio(finishSFX)
 }
 
 function windowResized () {
@@ -175,7 +172,7 @@ function mouseWheel (event) {
 }
 
 function keyPressed () {
-    tryPlayMusic()
+    tryPlayAudio(music)
 
     if (key === 'Q' || key === 'q') {
         rotateSun(-1)
@@ -240,27 +237,39 @@ function rotateSun (direction) {
     sunRotation += direction * sunRotateSpeed
     calculateSunAngle()
 
-    if (!isInShadow(player1Pos)) {
-        sunRotation -= direction * sunRotateSpeed
-        calculateSunAngle()
-        ResetMessage('This rotation will make player outside shadow.', 2000)
-    }
+    // if (!isInShadow(player1Pos)) {
+    //     sunRotation -= direction * sunRotateSpeed
+    //     calculateSunAngle()
+    //     ResetMessage('This rotation will make player outside shadow.', 2000)
+    // }
 }
 
 function isInShadow (position) {
-
-
     for (let block of blocks) {
+        // Check if the position is at the bottom of this block
+        if (position.x === block.position.x && position.y === block.position.y) {
+            continue // Skip shadow check for this block if we're at its bottom
+        }
+
         let shadowEnd = createVector(
             block.position.x + (block.height + 0.5) * sinAngleSun,
             block.position.y + (block.height + 0.5) * cosAngleSun
         )
 
-        if (position.x >= min(block.position.x, shadowEnd.x) &&
-            position.x <= max(block.position.x, shadowEnd.x) &&
-            position.y >= min(block.position.y, shadowEnd.y) &&
-            position.y <= max(block.position.y, shadowEnd.y)) {
-            return true
+        // Calculate the boundaries of the shadow
+        let minX = min(block.position.x, shadowEnd.x)
+        let maxX = max(block.position.x, shadowEnd.x)
+        let minY = min(block.position.y, shadowEnd.y)
+        let maxY = max(block.position.y, shadowEnd.y)
+
+        // Check if the position is within the shadow boundaries
+        if (position.x >= minX && position.x <= maxX &&
+            position.y >= minY && position.y <= maxY) {
+
+            // Additional check to exclude the bottom edge of the block
+            if (!(position.x === block.position.x && position.y === block.position.y)) {
+                return true
+            }
         }
     }
 
@@ -268,32 +277,60 @@ function isInShadow (position) {
 }
 
 function movePlayer (playerPos, direction, isPlayer1) {
-    nextPos = playerPos.copy().add(direction)
-    if (nextPos.x >= -centerOffset && nextPos.x <= centerOffset &&
-        nextPos.y >= -centerOffset && nextPos.y <= centerOffset) {
+    let nextPos = playerPos.copy().add(direction)
 
-        // must first push then check shadow
-        let canMove = handleCollision(nextPos, direction)
-        let inShadow = isInShadow(nextPos)
+    if (isOutOfBounds(nextPos)) {
+        return
+    }
 
-        if (!canMove) { ResetMessage('Cannot move out of bounds.', 2000) }
+    let isNextPosInShadow = isInShadow(nextPos)
+    let otherPlayerPos = isPlayer1 ? player2Pos : player1Pos
 
-        if (isPlayer1) {
-            if (!inShadow) { ResetMessage('Cannot move outside shadow.', 2000) }
-            if (canMove && inShadow) {
-                player1Pos = nextPos
-                if (player1Pos.equals(targetPosition)) {
-                    levelComplete()
-                }
-            }
-        } else {
-            if (inShadow) { ResetMessage('Cannot move inside shadow.', 2000) }
-            if (canMove && !inShadow) {
-                player2Pos = nextPos
-                if (player2Pos.equals(targetPosition)) {
-                    levelComplete()
-                }
-            }
+    if (isIllegalMove(isPlayer1, isNextPosInShadow) || isOverlap(nextPos, otherPlayerPos)) {
+        return
+    }
+
+    if (handleCollision(nextPos, direction)) {
+        updatePlayerPosition(playerPos, nextPos, isPlayer1)
+    }
+}
+
+function isOutOfBounds (pos) {
+    return pos.x < -centerOffset || pos.x > centerOffset ||
+        pos.y < -centerOffset || pos.y > centerOffset
+}
+
+function isIllegalMove (isPlayer1, isNextPosInShadow) {
+    if ((isPlayer1 && !isNextPosInShadow) || (!isPlayer1 && isNextPosInShadow)) {
+        let message = isPlayer1 ? 'Player 1 shall not move OUTSIDE shadow.' : 'Player 2 shall not move INSIDE shadow.'
+        ResetMessage(message, 2000)
+        errorSFX.play()
+        return true
+    }
+    return false
+}
+
+function isOverlap (nextPos, otherPlayerPos) {
+    if (nextPos.equals(otherPlayerPos)) {
+        ResetMessage('Players shall not overlap.', 2000)
+        errorSFX.play()
+        return true
+    }
+    return false
+}
+
+function updatePlayerPosition (currentPos, nextPos, isPlayer1) {
+    if (isPlayer1) {
+        player1Pos = nextPos
+        if (player1Pos.equals(targetPosition)) {
+            levelFinish()
+        }
+    } else {
+        player2Pos = nextPos
+        if (player2Pos.equals(targetPosition)) {
+            // levelFinish()
+            ResetMessage('No, you should help Player 1 get here.', 2000)
+            errorSFX.play()
         }
     }
 }
@@ -441,9 +478,9 @@ function drawHint () {
     push()
 
     textAlign(CENTER, CENTER)
-    textSize(fontHintSize)
+    textSize(hintSize)
     fill(100)
-    translate(0, 0, fontHintSize / 2)
+    translate(0, 0, hintSize / 2)
 
     push()
     translate(0, -250, 0)

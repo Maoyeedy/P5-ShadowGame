@@ -135,7 +135,7 @@ function tryPlayMusic () {
     }
 }
 
-function levelComplete () {
+function levelFinish () {
     ResetMessage('Level Finished!', 10000)
     if (enableMusic && !finishSFX.isPlaying()) {
         finishSFX.play()
@@ -263,7 +263,7 @@ function movePlayer (direction) {
         if (canMove && inShadow) {
             player1Pos = nextPos
             if (player1Pos.equals(targetPosition)) {
-                levelComplete()
+                levelFinish()
             }
         }
     }
