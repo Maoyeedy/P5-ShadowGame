@@ -1,6 +1,6 @@
 # [🎮 Play the Game!](https://maoyeedy.github.io/P5-ShadowGame/)
 
-### 🕹️ About the Game
+<!-- ### 🕹️ About the Game -->
 A [p5.js](https://p5js.org/) game for a [24-hour gamejam](https://itch.io/jam/equinox-game-jam).
 
 I'm completely new to p5.js and I'm learning as I go.
