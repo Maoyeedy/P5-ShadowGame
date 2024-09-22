@@ -42,3 +42,4 @@ The game can either be played with one or two players.
 ## 📝 To-Do
 - [ ] Make collision affect the other player
 - [ ] Add sun rotation check, just like Felix the Reaper
+- [ ] Add mobile controls
