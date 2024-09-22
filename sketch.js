@@ -4,6 +4,8 @@ let blockSize = 50
 let gridSize = 9
 let floorHeight = 0
 
+let bgColor = [210, 100, 50]
+
 let gridFill = [0, 0, 100]
 let gridStroke = [0]
 
@@ -13,7 +15,9 @@ let blockStroke = [0]
 let playerFill = [0, 0, 0]
 let playerStroke = [100]
 
-let bgColor = [210, 100, 50]
+let targetColor = [210, 100, 50]
+let targetStroke = [0]
+let targetStrokeWidth = 1
 
 // Shadows
 let shadowFill = [30, 50, 0, 1]
@@ -54,10 +58,10 @@ let music
 let musicIsPlayed = false
 
 function preload () {
-    soundFormats('mp3')
-    music = loadSound('./assets/music.mp3')
+    // soundFormats('mp3')
+    // music = loadSound('./assets/music.mp3')
     font = loadFont('./assets/FiraCode-Regular.ttf')
-    // always use relative path for github pages
+    // should always use relative path for github pages
 }
 
 function setup () {
@@ -71,9 +75,10 @@ function setup () {
 
     playerPos = createVector(0, 0)
 
-    blocks.push({ position: createVector(1, 1), height: 1 })
-    blocks.push({ position: createVector(2, 3), height: 2 })
-    blocks.push({ position: createVector(-2, 0), height: 3 })
+    blocks.push({ position: createVector(0, -3), height: 4 })
+    blocks.push({ position: createVector(3, -2), height: 3 })
+    blocks.push({ position: createVector(2, 3), height: 4 })
+    // blocks.push({ position: createVector(-2, 0), height: 3 })
 }
 
 function draw () {
@@ -92,6 +97,7 @@ function draw () {
     drawPlayer()
     drawGrid()
     drawHint()
+    drawTarget(2, 2, 1)
 }
 
 function windowResized () {
@@ -320,6 +326,8 @@ function drawShadows () {
 }
 
 function drawHint () {
+    push()
+
     textAlign(CENTER, CENTER)
     textSize(fontHintSize)
     fill(100)
@@ -337,4 +345,17 @@ function drawHint () {
     rotateZ(PI / 2)
     text('Use Q and E to rotate the sun', 0, 0)
     pop()
+
+    pop()
 }
+
+function drawTarget (x, y, radius) {
+    push()
+    translate(x * blockSize, y * blockSize, floorHeight + 0.2) // Set close to floor level
+    fill(targetColor)
+    stroke(targetStroke)
+    strokeWeight(targetStrokeWidth)
+    ellipse(0, 0, radius * blockSize)
+    pop()
+}
+
