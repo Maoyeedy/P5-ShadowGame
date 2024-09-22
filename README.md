@@ -1,32 +1,32 @@
 # [🎮 Play the Game!](https://maoyeedy.github.io/P5-ShadowGame/)
 
 ### 🕹️ About the Game
-The game was for [a 24-hours gamejam](https://itch.io/jam/equinox-game-jam).
+A [p5.js](https://p5js.org/) game for a [24-hour gamejam](https://itch.io/jam/equinox-game-jam).
 
-I'm completely new to [p5.js](https://p5js.org/) and I'm learning as I go.
+I'm completely new to p5.js and I'm learning as I go.
 
 <!-- It's pretty painful to setup collision without [p5play](https://http://p5play.org/). -->
 
 ## 🌞 Gameplay
 
-The game can either be played with one player or two players.
+The game can either be played with one or two players.
 
 <!-- #### 🚧 Mechanics:
 - **Black Cube** can only move within the shadows.
 - **White Cube** can push blocks but cannot enter the shadows. -->
 
-#### 🎯 Objective:
+#### 🎯 Win Condition
 <!-- - **Black Cube** must navigate through the shadowed blocks and reach the final target to win. -->
 - **Black Cube** reaches the final target.
 
-#### ⌨️ Controls:
+#### ⌨️ Controls
 <!-- - *WASD* moves the **Black Cube**. -->
 <!-- - *Arrow keys* moves the **White Cube**. -->
 - `W`, `A`, `S`, `D` move the **Black Cube**.
 - `↑`, `←`, `↓`, `→` move the **White Cube**.
 - `Q`, `E` rotates the sun.
 
-#### 🛠️ Other Utilities
+#### 🛠️ Extra Utilities
 - Drag and scroll with your mouse
 - `I`,`O`,`P` 
 - `R` to reload
