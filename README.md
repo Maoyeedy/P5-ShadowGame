@@ -42,6 +42,7 @@ The game can either be played with one or two players.
 <!-- I made a bug, which lead to player1 not able to push blocks, but turns out it works better. So now, player1 can only walk in shadow, and player2 can only push blocks. -->
 
 ## 📝 To-Do
+- [x] Add sun rotation animation
 - [ ] Make collision affect the other player
 - [ ] Add sun rotation check, just like Felix the Reaper
 - [ ] Add mobile controls
