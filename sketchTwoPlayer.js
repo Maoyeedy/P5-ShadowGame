@@ -12,8 +12,10 @@ let gridStroke = [0]
 let blockFill = [60, 100, 50]
 let blockStroke = [0]
 
-let playerFill = [0, 0, 0]
-let strokeColor = [100]
+let player1Fill = [0, 0, 0]
+let player1Stroke = [100]
+let player2Fill = [0, 100, 100]
+let player2Stroke = [0]
 
 let targetColor = [210, 100, 50]
 let targetStroke = [0]
@@ -52,6 +54,7 @@ let sceneScaleMax = 2
 let centerOffset
 let blocks = []
 let player1Pos
+let player2Pos
 let nextPos
 let lastMouseX
 let rotationDelta = 0
@@ -71,17 +74,10 @@ let messageDuration = 0
 let messageColor = [0, 0, 100]
 let messageSize = 24
 
-function preload () {
-    // should always use relative path for github pages
-    font = loadFont('./assets/FiraCode-Regular.ttf')
-    if (enableMusic) {
-        soundFormats('mp3')
-        music = loadSound('./assets/music.mp3')
-        finishSFX = loadSound('./assets/SFXfinish.mp3')
-    }
-}
-
 function setup () {
+    music.setVolume(0.1)
+    finishSFX.setVolume(1)
+
     createCanvas(windowWidth, windowHeight, WEBGL)
 
     colorMode(HSL)
@@ -93,36 +89,23 @@ function setup () {
     calculateSunAngle()
 
     player1Pos = createVector(0, 0)
+    player2Pos = createVector(-3, -3)
 
     blocks.push({ position: createVector(0, -3), height: 4 })
     blocks.push({ position: createVector(3, -2), height: 3 })
     blocks.push({ position: createVector(2, 3), height: 5 })
-    // blocks.push({ position: createVector(-2, 0), height: 3 })
-    targetPosition = createVector(2, 2)
 
-    music.setVolume(0.1)
-    finishSFX.setVolume(1)
+    targetPosition = createVector(2, 2)
 }
 
-function draw () {
-    background(bgColor)
-    scale(sceneScale)
-
-    if (useOrtho) { ortho() } else { perspective() }
-
-    DrawMessage()
-
-    rotateX(PI / 3)
-    rotateZ(-PI / 4)
-    if (useRotation) { rotateZ(rotationDelta) }
-    // orbitControl()
-
-    drawShadows()
-    drawBlocks()
-    drawPlayer()
-    drawGrid()
-    drawHint()
-    drawTarget(targetPosition.x, targetPosition.y)
+function preload () {
+    // should always use relative path for github pages
+    font = loadFont('./assets/FiraCode-Regular.ttf')
+    if (enableMusic) {
+        soundFormats('mp3')
+        music = loadSound('./assets/music.mp3')
+        finishSFX = loadSound('./assets/SFXfinish.mp3')
+    }
 }
 
 function tryPlayMusic () {
@@ -136,6 +119,27 @@ function levelComplete () {
     if (enableMusic && !finishSFX.isPlaying()) {
         finishSFX.play()
     }
+}
+
+function draw () {
+    background(bgColor)
+    scale(sceneScale)
+
+    if (useOrtho) { ortho() } else { perspective() }
+
+    DrawMessage()
+
+    rotateX(PI / 3)
+    rotateZ(-PI / 4)
+    if (useRotation) { rotateZ(rotationDelta) }
+
+    drawShadows()
+    drawBlocks()
+    drawPlayer(player1Pos, player1Fill, player1Stroke)
+    drawPlayer(player2Pos, player2Fill, player2Stroke)
+    drawGrid()
+    drawHint()
+    drawTarget(targetPosition.x, targetPosition.y)
 }
 
 function windowResized () {
@@ -175,9 +179,8 @@ function keyPressed () {
     if (key === 'E' || key === 'e') {
         rotateSun(1)
     }
-
     if (key === 'R' || key === 'r') {
-        location.reload() // Reload the page when 'R' is pressed
+        location.reload()
     }
 
     // User Settings
@@ -191,21 +194,36 @@ function keyPressed () {
         useCoordinates = !useCoordinates
     }
 
-    // Movement
-    let moveDir = createVector(0, 0)
-
-    if (key === 'W' || key === 'w' || keyCode === UP_ARROW) {
-        moveDir.y = -1
-    } else if (key === 'S' || key === 's' || keyCode === DOWN_ARROW) {
-        moveDir.y = 1
-    } else if (key === 'A' || key === 'a' || keyCode === LEFT_ARROW) {
-        moveDir.x = -1
-    } else if (key === 'D' || key === 'd' || keyCode === RIGHT_ARROW) {
-        moveDir.x = 1
+    // Movement for player1 (WASD)
+    let moveDir1 = createVector(0, 0)
+    if (key === 'W' || key === 'w') {
+        moveDir1.y = -1
+    } else if (key === 'S' || key === 's') {
+        moveDir1.y = 1
+    } else if (key === 'A' || key === 'a') {
+        moveDir1.x = -1
+    } else if (key === 'D' || key === 'd') {
+        moveDir1.x = 1
     }
 
-    if (moveDir.x !== 0 || moveDir.y !== 0) {
-        movePlayer(moveDir)
+    if (moveDir1.x !== 0 || moveDir1.y !== 0) {
+        movePlayer(player1Pos, moveDir1, true)
+    }
+
+    // Movement for player2 (Arrow keys)
+    let moveDir2 = createVector(0, 0)
+    if (keyCode === UP_ARROW) {
+        moveDir2.y = -1
+    } else if (keyCode === DOWN_ARROW) {
+        moveDir2.y = 1
+    } else if (keyCode === LEFT_ARROW) {
+        moveDir2.x = -1
+    } else if (keyCode === RIGHT_ARROW) {
+        moveDir2.x = 1
+    }
+
+    if (moveDir2.x !== 0 || moveDir2.y !== 0) {
+        movePlayer(player2Pos, moveDir2, false)
     }
 }
 
@@ -245,21 +263,31 @@ function isInShadow (position) {
     return false
 }
 
-function movePlayer (direction) {
-    nextPos = player1Pos.copy().add(direction)
+function movePlayer (playerPos, direction, isPlayer1) {
+    nextPos = playerPos.copy().add(direction)
     if (nextPos.x >= -centerOffset && nextPos.x <= centerOffset &&
         nextPos.y >= -centerOffset && nextPos.y <= centerOffset) {
 
-        let inShadow = isInShadow(nextPos)
         let canMove = handleCollision(nextPos, direction)
+        let inShadow = isInShadow(nextPos)
 
         if (!canMove) { ResetMessage('Cannot move out of bounds.', 2000) }
-        if (!inShadow) { ResetMessage('Cannot move outside shadow.', 2000) }
 
-        if (canMove && inShadow) {
-            player1Pos = nextPos
-            if (player1Pos.equals(targetPosition)) {
-                levelComplete()
+        if (isPlayer1) {
+            if (!inShadow) { ResetMessage('Cannot move outside shadow.', 2000) }
+            if (canMove && inShadow) {
+                player1Pos = nextPos
+                if (player1Pos.equals(targetPosition)) {
+                    levelComplete()
+                }
+            }
+        } else {
+            if (inShadow) { ResetMessage('Cannot move inside shadow.', 2000) }
+            if (canMove && !inShadow) {
+                player2Pos = nextPos
+                if (player2Pos.equals(targetPosition)) {
+                    levelComplete()
+                }
             }
         }
     }
@@ -318,12 +346,10 @@ function drawGrid () {
         }
     }
 }
-
-
-function drawPlayer () {
+function drawPlayer (pos, fillColor, strokeColor) {
     push()
-    translate(player1Pos.x * blockSize, player1Pos.y * blockSize, blockSize / 2)
-    fill(playerFill)
+    translate(pos.x * blockSize, pos.y * blockSize, blockSize / 2)
+    fill(fillColor)
     stroke(strokeColor)
     strokeWeight(strokeWidth)
     box(blockSize, blockSize, blockSize)
