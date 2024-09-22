@@ -29,7 +29,7 @@ let sunRotateSpeed = Math.PI / 2 // 90 degrees in radians
 let sunRotation = 0
 
 // User Settings
-let playMusic = false
+let playMusic = true
 
 let useCoordinates = false
 let fontCoordinateSize = 10
