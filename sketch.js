@@ -93,20 +93,23 @@ function preload () {
 }
 
 function setup () {
+    document.oncontextmenu = () => false
+
+    // Audio
     music.setVolume(0.1)
     errorSFX.setVolume(1)
     finishSFX.setVolume(1)
 
+    // Canvas
     createCanvas(windowWidth, windowHeight, WEBGL)
-
     colorMode(HSL)
-
     textFont(font)
 
+    // Calculate
     centerOffset = floor(gridSize / 2)
-
     calculateSunAngle()
 
+    // Spawn
     player1Pos = createVector(0, 0)
     player2Pos = createVector(-3, -3)
 
@@ -170,7 +173,6 @@ function mousePressed () {
     lastMouseX = mouseX
     tryPlayAudio(music)
 }
-
 function mouseDragged () {
     if (mouseIsPressed) {
         let deltaX = mouseX - lastMouseX
