@@ -1,65 +1,68 @@
+let cvs
+
 // Grid 
-let strokeWidth = 1
-let blockSize = 50
-let gridSize = 9
-let floorHeight = 0
+const strokeWidth = 1
+const blockSize = 50
+const gridSize = 9
+const floorHeight = 0
 
-let bgColor = [210, 100, 50]
+const bgColor = [210, 100, 50]
 
-let gridFill = [0, 0, 100]
-let gridStroke = [0]
+const gridFill = [0, 0, 100]
+const gridStroke = [0]
 
-let blockFill = [60, 100, 50]
-let blockStroke = [0]
+const blockFill = [60, 100, 50]
+const blockStroke = [0]
 
-let player1Fill = [0, 0, 0]
-let player1Stroke = [100]
-let player2Fill = [0, 0, 90]
-let player2Stroke = [0]
+const player1Fill = [0, 0, 0]
+const player1Stroke = [100]
+const player2Fill = [0, 0, 90]
+const player2Stroke = [0]
 
-let targetColor = [210, 100, 50]
-let targetStroke = [0]
-let targetStrokeWidth = 1
-let targetPosition
-let targetRadius = 1
+const targetColor = [210, 100, 50]
+const targetStroke = [0]
+const targetStrokeWidth = 1
+const targetRadius = 1
 
 // Shadows
-let shadowFill = [30, 50, 0, 1]
-let playerShadowFill = [30, 50, 0, 1]
-let playerShadowLength = 1
-let enablePlayerShadow = false
+const shadowFill = [30, 50, 0, 1]
+const playerShadowFill = [30, 50, 0, 1]
+const playerShadowLength = 1
+const enablePlayerShadow = false
 
-let sunRotateAngle = Math.PI / 2
-let sunRotationDuration = 250
+const sunRotateAngle = Math.PI / 2
+const sunRotationDuration = 250
 
 let sunRotation = 0
 let targetSunRotation = 0
-
 let sunRotationStartTime = 0
 let isSunRotating = false
 
 // User Settings
-let useCoordinates = false
-let fontCoordinateSize = 10
-let coordinateFill = [15, 100, 50]
-
 let useOrtho = true
 let useStackedBlocks = true
+let useCoordinates = false
+const fontCoordinateSize = 10
+const coordinateFill = [15, 100, 50]
 
-let useRotation = true
-let rotateSpeed = 0.002
+const enableRotation = true
+const rotateSpeed = 0.002
 
+const sceneScaleScrollStep = 0.0002
+const sceneScaleMin = 0.5
+const sceneScaleMax = 2
 let sceneScale = 1
-let sceneScaleScrollStep = 0.0002
-let sceneScaleMin = 0.5
-let sceneScaleMax = 2
 
 // Runtime Variables
 let centerOffset
 let blocks = []
+
 let player1Pos
 let player2Pos
 let nextPos
+
+let targetPosition
+
 let lastMouseX
 let rotationDelta = 0
 let cosAngleSun
@@ -68,10 +71,10 @@ let sinAngleSun
 // Assets
 let font
 let hintSize = 16
-let music
-let musicIsPlayed = false
 let finishSFX
 let errorSFX
+let music
+let musicIsPlayed = false
 
 // Message
 let message = ''
@@ -87,12 +90,11 @@ function preload () {
     soundFormats('mp3')
     music = loadSound('./assets/music.mp3')
     finishSFX = loadSound('./assets/SFXfinish.mp3')
-    // errorSFX = loadSound('./assets/SFXerror.mp3')
-    // errorSFX = loadSound('./assets/SFXerrorUI.mp3')
     errorSFX = loadSound('./assets/SFXmistake.mp3')
 }
 
 function setup () {
+    // Only enable thisfor screenshot
     document.oncontextmenu = () => false
 
     // Audio
@@ -101,7 +103,9 @@ function setup () {
     finishSFX.setVolume(1)
 
     // Canvas
-    createCanvas(windowWidth, windowHeight, WEBGL)
+    cvs = createCanvas(windowWidth, windowHeight, WEBGL)
+    // cvs.doubleClicked(() => fullscreen(!fullscreen()))
+
     colorMode(HSL)
     textFont(font)
 
@@ -145,7 +149,7 @@ function draw () {
 
     rotateX(PI / 3)
     rotateZ(-PI / 4)
-    if (useRotation) { rotateZ(rotationDelta) }
+    if (enableRotation) { rotateZ(rotationDelta) }
 
     drawShadows()
     drawBlocks()
@@ -179,7 +183,7 @@ function mouseDragged () {
         rotationDelta -= deltaX * rotateSpeed
 
         // rotationDelta = constrain(rotationDelta, -PI / 4 + 0.001, PI / 4 - 0.001)
-        rotationDelta = constrain(rotationDelta, -PI / 2, PI / 2)
+        rotationDelta = constrain(rotationDelta, 0, PI / 2)
         lastMouseX = mouseX
     }
 }
