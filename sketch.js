@@ -51,7 +51,7 @@ const rotateSpeed = 0.002
 const sceneScaleScrollStep = 0.0002
 const sceneScaleMin = 0.5
 const sceneScaleMax = 2
-let sceneScale = 1
+let sceneScale = 1.5
 
 // Runtime Variables
 let centerOffset
@@ -115,7 +115,7 @@ function setup () {
 
     // Spawn
     player1Pos = createVector(0, 0)
-    player2Pos = createVector(-3, -3)
+    player2Pos = createVector(-4, -4)
 
     blocks.push({ position: createVector(0, -3), height: 4 })
     blocks.push({ position: createVector(3, -1), height: 3 })
